@@ -11,9 +11,9 @@ const AuthProvider = ({ children }) => {
     if (storedUser) setLoggedUser(JSON.parse(storedUser));
   }, []);
 
-  const register = async (name, email, mobileNumber, password) => {
+  const register = async (name, email, password) => {
     try {
-      const res = await registerUser({ name, email, mobileNumber, password });
+      const res = await registerUser({ name, email, password });
       return res.data.msg;
     } catch (err) {
       console.error(err);
