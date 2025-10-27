@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect } from "react";
 import { registerUser, loginUser } from "../apis/authApis";
+import axiosInstance from "../apis/axiosInstance";
 
 export const AuthContext = createContext();
 
@@ -7,8 +8,15 @@ const AuthProvider = ({ children }) => {
   const [loggedUser, setLoggedUser] = useState(null);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("loggedInAdmin");
-    if (storedUser) setLoggedUser(JSON.parse(storedUser));
+    const storedUser = localStorage.getItem("loggedInUser");
+    const token = localStorage.getItem("token");
+
+    if (storedUser && token) {
+      setLoggedUser(JSON.parse(storedUser));
+
+      // ✅ Attach token to axios headers globally
+      axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    }
   }, []);
 
   const register = async (name, email, password) => {
@@ -21,36 +29,38 @@ const AuthProvider = ({ children }) => {
     }
   };
 
+ const login = async (email, password) => {
+  try {
+    const res = await loginUser({ email, password });
 
+    if (res.data.success) {
+      const { user, token } = res.data;
 
-  const login = async (email, password) => {
-    try {
-      const res = await loginUser({ email, password });
+      // 🧠 Store user + token
+      localStorage.setItem("token", token);
+      localStorage.setItem("loggedInUser", JSON.stringify(user));
 
-      if (res.data.success) {
-        // ✅ Store token and user info
-        localStorage.setItem("token", res.data.token);
-        localStorage.setItem(
-          "loggedInAdmin",
-          JSON.stringify({ email, name: res.data.name, user_id: res.data.user_id })
-        );
+      setLoggedUser(user);
 
-        setLoggedUser({ email, name: res.data.name, user_id: res.data.user_id });
+      // Add token to all axios requests
+      axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
-        // ✅ Return full response to handle in Login.jsx
-        return { success: true, msg: res.data.msg };;
-      }
-      //  return { success: false, msg: res.data.msg || "Login failed ❌" };
-    } catch (err) {
-      console.error(err);
-      return { success: false, msg: "Login failed ❌" };
+      return { success: true, msg: res.data.msg };
     }
-  };
+
+    return { success: false, msg: res.data.msg || "Login failed ❌" };
+  } catch (err) {
+    console.error("Login error:", err);
+    return { success: false, msg: "Login failed ❌" };
+  }
+};
+
 
   const logout = () => {
     setLoggedUser(null);
     localStorage.removeItem("token");
-    localStorage.removeItem("loggedInAdmin");
+    localStorage.removeItem("loggedInUser");
+    delete axiosInstance.defaults.headers.common["Authorization"];
   };
 
   return (
