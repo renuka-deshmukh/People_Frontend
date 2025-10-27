@@ -1,11 +1,20 @@
 import axiosInstance from "../apis/axiosInstance";
 
+// ✅ Get all people
 export const getAllPeople = () => axiosInstance.get('/people/getPeople');
 
-export const createPeople = (formData) =>  axiosInstance.post("/people/createPeople", formData, {
+// ✅ Create new person (with image upload)
+export const createPeople = (formData) =>
+  axiosInstance.post("/people/createPeople", formData, {
     headers: { "Content-Type": "multipart/form-data" },
-});
+  });
 
-export const deletePeople = (id) => axiosInstance.delete(`/people/deletePeople/${id}`);
+// ✅ Update person (with image upload if included)
+export const updatePeople = (id, formData) =>
+  axiosInstance.put(`/people/updatePeople/${id}`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
 
-export const updatePeople = (id, formData) => axiosInstance.put(`/people/updatePeople/${id}`, formData)
+// ✅ Delete person
+export const deletePeople = (id) =>
+  axiosInstance.delete(`/people/deletePeople/${id}`);
