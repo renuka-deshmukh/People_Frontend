@@ -7,17 +7,11 @@ export const AuthContext = createContext();
 const AuthProvider = ({ children }) => {
   const [loggedUser, setLoggedUser] = useState(null);
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem("loggedInUser");
-    const token = localStorage.getItem("token");
-
-    if (storedUser && token) {
-      setLoggedUser(JSON.parse(storedUser));
-
-      // ✅ Attach token to axios headers globally
-      axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    }
+   useEffect(() => {
+    const storedUser = localStorage.getItem("loggedUser");
+    if (storedUser) setLoggedUser(JSON.parse(storedUser));
   }, []);
+
 
   const register = async (name, email, password) => {
     try {
@@ -29,31 +23,30 @@ const AuthProvider = ({ children }) => {
     }
   };
 
- const login = async (email, password) => {
-  try {
-    const res = await loginUser({ email, password });
+  const login = async (email, password) => {
+    try {
+      const res = await loginUser({ email, password });
 
-    if (res.data.success) {
-      const { user, token } = res.data;
+      if (res.data.success) {
+        // ✅ Store token and user info
+        localStorage.setItem("token", res.data.token);
+        localStorage.setItem(
+          "loggedUser",
+          JSON.stringify({ email, name: res.data.name, user_id: res.data.user_id })
+        );
 
-      // 🧠 Store user + token
-      localStorage.setItem("token", token);
-      localStorage.setItem("loggedInUser", JSON.stringify(user));
+        setLoggedUser({ email, name: res.data.name, user_id: res.data.user_id });
 
-      setLoggedUser(user);
-
-      // Add token to all axios requests
-      axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-
-      return { success: true, msg: res.data.msg };
+        // ✅ Return full response to handle in Login.jsx
+        return { success: true, msg: res.data.msg };;
+      }
+      //  return { success: false, msg: res.data.msg || "Login failed ❌" };
+    } catch (err) {
+      console.error(err);
+      return { success: false, msg: "Login failed ❌" };
     }
+  };
 
-    return { success: false, msg: res.data.msg || "Login failed ❌" };
-  } catch (err) {
-    console.error("Login error:", err);
-    return { success: false, msg: "Login failed ❌" };
-  }
-};
 
 
   const logout = () => {

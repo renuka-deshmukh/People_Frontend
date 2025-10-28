@@ -4,10 +4,10 @@ import axiosInstance from "./axiosInstance";
 export const registerUser = (adminData) =>
   axiosInstance.post("/user/register", adminData);
 
-// Login
-export const loginUser = (credentials) =>
-  axiosInstance.post("/user/login", credentials);
+export async function loginUser(credentials) {
+  return axiosInstance.post("/user/login", credentials);
+}
 
 // ✅ Get User Info by ID
 export const getUserInfoById = (userId) =>
-  axiosInstance.get(`/user/getUserInfo/${userId}`);
+  axiosInstance.get(`/user/me/${userId}`);
