@@ -27,23 +27,24 @@ const PersonDetails = ({ person, onClose }) => {
         <h6 className="fw-bold mb-3">Personal Information</h6>
         <div className="row mb-2">
           <div className="col-4 fw-semibold text-muted">Date of Birth:</div>
-          <div className="col-8">{person.dob || "—"}</div>
+          <div className="col-8">{person.dateOfBirth || "—"}</div>
         </div>
-        <div className="row mb-2">
-          <div className="col-4 fw-semibold text-muted">Gender:</div>
-          <div className="col-8">{person.gender || "—"}</div>
-        </div>
-        <div className="row mb-2">
+         <div className="row mb-2">
           <div className="col-4 fw-semibold text-muted">Contact:</div>
-          <div className="col-8">{person.contactNo || "—"}</div>
+          <div className="col-8">{person.phone || "—"}</div>
         </div>
+        <div className="row mb-2">
+          <div className="col-4 fw-semibold text-muted">Address:</div>
+          <div className="col-8">{person.address || "—"}</div>
+        </div>
+       
         <div className="row mb-2">
           <div className="col-4 fw-semibold text-muted">Email:</div>
           <div className="col-8">{person.email || "—"}</div>
         </div>
         <div className="row mb-2">
-          <div className="col-4 fw-semibold text-muted">Nationality:</div>
-          <div className="col-8">{person.nationality || "—"}</div>
+          <div className="col-4 fw-semibold text-muted">Work Email Address:</div>
+          <div className="col-8">{person.email || "—"}</div>
         </div>
 
         <h6 className="fw-bold mt-4 mb-3">Research & Publication</h6>
